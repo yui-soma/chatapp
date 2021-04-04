@@ -1,3 +1,5 @@
+import {useState} from 'react';
+import {useHistory, Link} from 'react-router-dom';
 import { Button, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -17,7 +19,10 @@ const useStyls = makeStyles({
 });
 
 const Login = () => {
+    const history = useHistory();
     const classes = useStyls();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     return (
         <form className={classes.root}>
             <Typography variant="h1" className={classes.title}>ログインページ</Typography>
@@ -26,6 +31,7 @@ const Login = () => {
             <Button variant="contained" color="secondary">
                 ログイン
             </Button>
+            <Link to='/signup'>アカウントを既にお持ちの方</Link>
         </form>
     );
 };
