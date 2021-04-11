@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {useHistory, Link} from 'react-router-dom';
 import { Button, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import {auth} from '../firebase/config';
 
 const useStyls = makeStyles({
     root: {
@@ -23,12 +24,36 @@ const Login = () => {
     const classes = useStyls();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        auth
+            .signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log('ログイン成功', userCredential);
+                history.push('/');
+            })
+    };
     return (
-        <form className={classes.root}>
-            <Typography variant="h1" className={classes.title}>ログインページ</Typography>
-            <TextField variant="filled" label="メールアドレス" />
-            <TextField variant="outlined" label="パスワード" />
-            <Button variant="contained" color="secondary">
+        <form onSubmit={handleSubmit} className={classes.root}>
+            <Typography variant="h1" className={classes.title}>
+                ログインページ
+            </Typography>
+            <TextField 
+                value = {email}
+                onChange = {(e) => {setEmail(e.target.value)}}
+                fullWidth
+                variant="filled" 
+                label="メールアドレス" 
+            />
+            <TextField 
+                value = {password}
+                onChange = {(e) => {setPassword(e.target.value)}}
+                type = 'password'
+                fullWidth
+                variant="outlined" 
+                label="パスワード" 
+            />
+            <Button type='submit' fullWidth variant="contained" color="secondary">
                 ログイン
             </Button>
             <Link to='/signup'>アカウントを既にお持ちの方</Link>

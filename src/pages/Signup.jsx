@@ -4,7 +4,7 @@ import {Button, TextField, Typography} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import {auth} from '../firebase/config';
 
-const useStyls = makeStyles({
+const useStyles = makeStyles({
     root: {
         width: "400px",
         height: "370px",
@@ -21,7 +21,7 @@ const useStyls = makeStyles({
 
 const Signup = () => {
     const history = useHistory();
-    const classes = useStyls();
+    const classes = useStyles();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
