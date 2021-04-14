@@ -8,9 +8,11 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import {auth} from '../firebase/config';
+import firebase,{auth} from '../firebase/config';
 import {AuthContext} from '../context/AuthContext';
 import {db} from '../firebase/config';
+import ChatForm from '../components/ChatForm';
+
 
 const useStyles = makeStyles({
     root: {
@@ -29,8 +31,9 @@ const useStyles = makeStyles({
 
 const Room = () => {
     const classes = useStyles();
-    const value = useContext(AuthContext);
+    const authState = useContext(AuthContext);
     const [massages, setMessages] = useState([]);
+    const messagesRef = db.collection('messages');
 
     const logout = () => {
         auth
@@ -39,8 +42,20 @@ const Room = () => {
             .catch(() =>console.log('ログアウト失敗'));
     };
 
+const addChat = (text) => {
+    if (authState.loading || authState.user ==! null){
+        return;
+    }
+    messagesRef.add({
+        content: text,
+        username: authState.user.displayName,
+        autherId: authState.user.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+};
+
     useEffect(() => {
-        db.collection('messages')
+        messagesRef
             .get()
             .then((querySnapshot) => {
                 const data = querySnapshot.docs.map((doc) => ({
@@ -58,12 +73,7 @@ const Room = () => {
     return (
         <div className = {classes.root}>
             <h1>チャットルーム</h1>
-            <form>
-                <TextField placeholder = 'チャットを入力...' />
-                <Button variant = 'contained' color = 'primary'>
-                    送信
-                </Button>
-            </form>
+            <ChatForm addChat = {addChat} />
             <div className = {classes.cardContainer}>
                 {massages.map((massage) => {
                     return (
