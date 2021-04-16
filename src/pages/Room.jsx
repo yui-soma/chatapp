@@ -12,7 +12,7 @@ import firebase,{auth} from '../firebase/config';
 import {AuthContext} from '../context/AuthContext';
 import {db} from '../firebase/config';
 import ChatForm from '../components/ChatForm';
-
+import DeleteDialog from '../components/DeleteDialog';
 
 const useStyles = makeStyles({
     root: {
@@ -34,6 +34,7 @@ const Room = () => {
     const authState = useContext(AuthContext);
     const [massages, setMessages] = useState([]);
     const messagesRef = db.collection('messages');
+    const [deleteChatId, setDeleteChatId] = useState();
 
     const logout = () => {
         auth
@@ -55,19 +56,29 @@ const addChat = (text) => {
 };
 
     useEffect(() => {
-        messagesRef
-            .get()
-            .then((querySnapshot) => {
-                const data = querySnapshot.docs.map((doc) => ({
+        messagesRef.orderBy('createdAt','desc').onSnapshot((querySnapshot) => {
+                const data = querySnapshot.docs.map((doc) => {
+                    return {
                     ...doc.data(),
                     id: doc.id,
-                }));
-                console.log(data);
+                    };
+                });
                 setMessages(data);
             })
-            .catch((err) => {
-                console.log('ユーザー取得失敗', err);
-            });
+            
+        // messagesRef
+        //     .get()
+        //     .then((querySnapshot) => {
+        //         const data = querySnapshot.docs.map((doc) => ({
+        //             ...doc.data(),
+        //             id: doc.id,
+        //         }));
+        //         console.log(data);
+        //         setMessages(data);
+        //     })
+        //     .catch((err) => {
+        //         console.log('ユーザー取得失敗', err);
+        //     });
     },[]);
 
     return (
@@ -80,7 +91,13 @@ const addChat = (text) => {
                         <Card key = {massage.id} className = {classes.card}>
                             <CardHeader 
                                 title= {massage.username}
-                                action = {<Button variant = 'contained'>削除</Button>}
+                                action = {
+                                <Button
+                                    onClick = {() =>setDeleteChatId(massage.id)}
+                                    variant = 'contained'
+                                >
+                                    削除
+                                </Button>}
                             />
                             <CardContent>
                                 <Typography>{massage.content}</Typography>
@@ -90,6 +107,7 @@ const addChat = (text) => {
                 })}
             </div>
             <Button onClick={logout}>ログアウト</Button>
+            <DeleteDialog id = {deleteChatId} onCancel= {() => setDeleteChatId("")} />
         </div>
     );
 };
