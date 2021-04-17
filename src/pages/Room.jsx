@@ -55,6 +55,14 @@ const addChat = (text) => {
     });
 };
 
+const deleteChat = (id) => {
+    db.collection('messages')
+    .doc(id)
+    .delete()
+    .then(() => setDeleteChatId('')) 
+    .catch((err) => console.log("削除失敗", err));
+};
+
     useEffect(() => {
         messagesRef.orderBy('createdAt','desc').onSnapshot((querySnapshot) => {
                 const data = querySnapshot.docs.map((doc) => {
@@ -87,17 +95,20 @@ const addChat = (text) => {
             <ChatForm addChat = {addChat} />
             <div className = {classes.cardContainer}>
                 {massages.map((massage) => {
+                    console.log(authState.user.uid , massage)
                     return (
                         <Card key = {massage.id} className = {classes.card}>
                             <CardHeader 
                                 title= {massage.username}
                                 action = {
+                                    authState.user.uid === massage.autherId && (
                                 <Button
                                     onClick = {() =>setDeleteChatId(massage.id)}
                                     variant = 'contained'
                                 >
                                     削除
-                                </Button>}
+                                </Button>
+                                    )}
                             />
                             <CardContent>
                                 <Typography>{massage.content}</Typography>
@@ -107,7 +118,10 @@ const addChat = (text) => {
                 })}
             </div>
             <Button onClick={logout}>ログアウト</Button>
-            <DeleteDialog id = {deleteChatId} onCancel= {() => setDeleteChatId("")} />
+            <DeleteDialog 
+                id = {deleteChatId}
+                onOk={deleteChat} 
+                onCancel= {() => setDeleteChatId("")} />
         </div>
     );
 };

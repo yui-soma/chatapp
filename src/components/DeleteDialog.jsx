@@ -6,7 +6,7 @@ const DeleteDialog = ({ id, onOk, onCancel }) => {
             <Dialog open = {open}>
             <DialogTitle>削除してよろしいですか？</DialogTitle>
             <DialogActions>
-            <Button onClick={onOk}>はい</Button>
+            <Button onClick={() => onOk(id)}>はい</Button>
             <Button onClick={onCancel}>いいえ</Button>
             </DialogActions>
             </Dialog>
